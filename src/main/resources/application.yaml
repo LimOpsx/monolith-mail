@@ -1,0 +1,16 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: monilith
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/monolith?serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false&failOverReadOnly=false
+    username: 'root'
+    password: '123'
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+mail:
+  host: 'localhost'

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cloud.dowhat.monolith.web.mapper.IRecipientMapper">
+
+    <resultMap id="baseMap" type="cloud.dowhat.monolith.model.Recipient">
+        <id property="id" column="id"/>
+        <result property="recipientAddress" column="recipient_address"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="del" column="del"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into t_recipient (recipient_address)
+        values (#{ew.recipientAddress});
+    </insert>
+
+    <update id="updateById">
+        update t_recipient
+        set del = 1
+        where id = #{id};
+    </update>
+    <update id="update">
+        update t_recipient
+        set del = 1
+        where recipient_address = #{ew.recipientAddress};
+    </update>
+    <select id="selectListByAddress" resultMap="baseMap">
+        select * from t_recipient where recipient_address in
+        <foreach collection="array" item="ew" open="(" close=")" separator=",">
+            #{ew}
+        </foreach>
+    </select>
+    <select id="selectOne" resultType="cloud.dowhat.monolith.model.Recipient">
+        select *
+        from t_recipient
+        where del = 0
+          and recipient_address = #{ew.recipientAddress}
+    </select>
+</mapper>
