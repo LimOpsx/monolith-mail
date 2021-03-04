@@ -20,7 +20,7 @@
 - -5.1: docker start command:
 
 ```
-docker run --name monolith  -d -p 25:25 -p 端口映射:8080 monolith
+docker run --name monolith  -d -p 25:25 -p port:8080 monolith
 ```
 
 - 6: Open IP: port / to access
