@@ -1,6 +1,6 @@
 ###  [gitee地址](http://gitee.com/opsx/monolith-mail)
 
-###  [chinese README](README_zh.md)
+###  [chinese README](./README_zh.md)
 
 ### function
 
