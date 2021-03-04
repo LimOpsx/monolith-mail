@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.net.ServerSocket;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -25,12 +26,14 @@ public class Server {
     public void listener() {
         ThreadUtil.newExecutor(5,10).execute(()->{
             AtomicReference<ServerSocket> serverSocket = new AtomicReference<>();
-            //listener port:25 todo: pop3 or 465
+            //listener port:25
             log.info(new Date() + "\tThe mailbox has been started");
             try {
                 serverSocket.set(new ServerSocket(25));
                 for (; ; ) {
                     smtpSession.setSocket(serverSocket.get().accept());
+                    //todo: sleep 2s
+                    ThreadUtil.sleep(2, TimeUnit.SECONDS);
                     smtpSession.run();
                 }
             }catch (Exception e){
