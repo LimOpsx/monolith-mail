@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * @author linen
  */
 @Configuration
-@ConfigurationProperties(prefix = "mail")
+@ConfigurationProperties(prefix = "monolith.mail.host")
 @Getter
 @Setter
 public class MailConfig {

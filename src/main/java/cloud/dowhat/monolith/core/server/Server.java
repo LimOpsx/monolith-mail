@@ -1,5 +1,7 @@
 package cloud.dowhat.monolith.core.server;
 
+import cloud.dowhat.monolith.core.pool.object.MonoSocket;
+import cloud.dowhat.monolith.core.prop.PoolProperties;
 import cloud.dowhat.monolith.core.session.smtp.SMTPSession;
 import cn.hutool.core.thread.ThreadUtil;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,8 @@ public class Server {
 
     private final SMTPSession smtpSession;
 
+    private final PoolProperties poolProperties;
+
     @PostConstruct
     public void listener() {
         ThreadUtil.newExecutor(5,10).execute(()->{
@@ -29,7 +33,7 @@ public class Server {
             //listener port:25
             log.info(new Date() + "\tThe mailbox has been started");
             try {
-                serverSocket.set(new ServerSocket(25));
+                serverSocket.set(new MonoSocket(poolProperties.getPort()));
                 for (; ; ) {
                     smtpSession.setSocket(serverSocket.get().accept());
                     //todo: sleep 2s

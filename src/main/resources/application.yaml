@@ -1,16 +1,38 @@
 server:
-  port: 8080
+  port: ${port:8080}
 spring:
   application:
     name: monilith
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/monolith?serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false&failOverReadOnly=false
-    username: 'root'
-    password: '123'
+    url: jdbc:mysql://localhost:3306/monolith?characterEncoding=utf8&useUnicode=true&verifyServerCertificate=false&useSSL=false&requireSSL=false&serverTimezone=UTC
+    type: com.zaxxer.hikari.HikariDataSource
+    username: root
+    password: '123456'
+    hikari:
+      minimum-idle: 5
+      idle-timeout: 180000
+      maximum-pool-size: 10
+      auto-commit: true
+      pool-name: MyHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 
-mail:
-  host: 'localhost'
+monolith:
+  socket:
+    pool:
+      port: 25
+      max_total: 60
+      max_idle: 50
+      min_idle: 10
+      max_cache: 256
+      timeout: 50000
+      init_conn: 10
+  mail:
+    host:
+      host: 'your host'
