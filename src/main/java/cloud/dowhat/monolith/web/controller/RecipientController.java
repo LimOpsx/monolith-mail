@@ -26,6 +26,11 @@ public class RecipientController {
         return R.<String>ok(iRecipientService.getNewRecipient(address));
     }
 
+    /**
+     * close delete address
+     * @param address address
+     * @return void
+     */
     @PostMapping("/update")
     public R<Void> update(@RequestBody String address){
         iRecipientService.update(address);

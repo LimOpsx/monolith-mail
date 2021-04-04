@@ -65,22 +65,30 @@ public class MessageServiceImpl implements IMessageService {
             MessageRecipient messageRecipient = new MessageRecipient();
             messageRecipient.setMessageId(message.getId());
             String address = addresses[i];
-            messageRecipient.setRecipientId(addressAndId.get(address));
+            messageRecipient.setRecipientId(getResultAddress(addressAndId, address));
             messageRecipient.setType(EmailTypeEnum.getCodeByAddressIndex(i));
             iMessageRecipientMapper.insert(messageRecipient);
             //send mail content to html
             CopyOnWriteArraySet<ConcurrentHashMap<String, WebSocketServer>> concurrentHashMapCopyOnWriteArraySet = WebSocketServer.getWEB_SOCKET_SERVERS();
             concurrentHashMapCopyOnWriteArraySet.forEach(webSocketServerConcurrentHashMap -> {
                 try {
-                    if (webSocketServerConcurrentHashMap.get(address) != null) {
-                        log.info("publish ws_query_string:{}", address);
-                        WebSocketServer webSocketServer = webSocketServerConcurrentHashMap.get(address);
-                        webSocketServer.sendMessage(JSONObject.toJSONString(iMessageMapper.getMessages(address).get(0)));
-                    }
+                    log.info("publish ws_query_string:{}", address);
+                    WebSocketServer resultAddress = getResultAddress(webSocketServerConcurrentHashMap, address);
+                    resultAddress.sendMessage(JSONObject.toJSONString(iMessageMapper.getMessages(address).get(0)));
                 } catch (IOException e) {
                     log.error("send msg to html error...", e);
                 }
             });
         }
+    }
+
+    private <T> T getResultAddress(Map<String, T> params, String email) {
+        for (Map.Entry<String, T> param : params.entrySet()) {
+            String key = param.getKey();
+            if (key.indexOf(email) > -1) {
+                return param.getValue();
+            }
+        }
+        throw new RuntimeException("Email format error!");
     }
 }

@@ -23,16 +23,10 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 
+
 monolith:
   socket:
-    pool:
-      port: 25
-      max_total: 60
-      max_idle: 50
-      min_idle: 10
-      max_cache: 256
-      timeout: 50000
-      init_conn: 10
+    port: 25
   mail:
     host:
       host: 'your host'

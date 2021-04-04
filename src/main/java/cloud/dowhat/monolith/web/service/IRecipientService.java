@@ -8,5 +8,9 @@ public interface IRecipientService {
      */
     String getNewRecipient(String address);
 
+    /**
+     * close delete address
+     * @param address address
+     */
     void update(String address);
 }

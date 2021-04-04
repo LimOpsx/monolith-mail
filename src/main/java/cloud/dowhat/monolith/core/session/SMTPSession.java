@@ -1,4 +1,4 @@
-package cloud.dowhat.monolith.core.session.smtp;
+package cloud.dowhat.monolith.core.session;
 
 import cloud.dowhat.monolith.core.component.MonolithEventManager;
 import cloud.dowhat.monolith.event.MessageEvent;
@@ -28,12 +28,14 @@ public class SMTPSession {
 
     public void run() {
         try {
-            br = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream())
-            );
-            ps = new PrintStream(
-                    socket.getOutputStream()
-            );
+            synchronized (this) {
+                br = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream())
+                );
+                ps = new PrintStream(
+                        socket.getOutputStream()
+                );
+            }
             doWelcome();
             String line;
             line = br.readLine();
@@ -42,102 +44,119 @@ public class SMTPSession {
                 String command = line.substring(0, 4).trim();
                 if (command.equalsIgnoreCase(SmtpEnum.HELO.getCode()) || command.equalsIgnoreCase(SmtpEnum.EHLO.getCode())) {
                     doHello();
-                } else if (command.equalsIgnoreCase(SmtpEnum.RSET.getCode()))
+                } else if (command.equalsIgnoreCase(SmtpEnum.RSET.getCode())) {
                     doRset();
-                else if (command.equalsIgnoreCase(SmtpEnum.MAIL.getCode()))
-                    doMail(line);
-                else if (command.equalsIgnoreCase(SmtpEnum.RCPT.getCode()))
-                    doRcpt(line);
-                else if (command.equalsIgnoreCase(SmtpEnum.DATA.getCode()))
+                } else if (command.equalsIgnoreCase(SmtpEnum.MAIL.getCode())) {
+                    doMail();
+                } else if (command.equalsIgnoreCase(SmtpEnum.RCPT.getCode())) {
+                    doRcpt();
+                } else if (command.equalsIgnoreCase(SmtpEnum.DATA.getCode())) {
                     doData();
-                else if (command.equalsIgnoreCase(SmtpEnum.NOOP.getCode()))
+                } else if (command.equalsIgnoreCase(SmtpEnum.NOOP.getCode())) {
                     doNoop();
-                else if (command.equalsIgnoreCase(SmtpEnum.QUIT.getCode())) {
+                } else if (command.equalsIgnoreCase(SmtpEnum.QUIT.getCode())) {
                     doQuit();
                     break;
                 }
                 line = br.readLine();
             }
         } catch (IOException e) {
-            ps.println("500  ERROR");
+            ps.print("500  ERROR\r\n");
             log.error("message switching error....", e);
         } finally {
             try {
                 br.close();
                 ps.close();
-                socket.close();
+                synchronized (this) {
+                    socket.close();
+                    log.info("socket current close...");
+                }
             } catch (IOException e) {
-                ps.println("500  ERROR");
+                ps.print("500  ERROR\r\n");
                 log.error("It is possible that an error occurred when the stream was closed....", e);
             }
         }
     }
 
+    /**
+     * nothing
+     */
     private void doNoop() {
-        ps.println("250 OK");
+        ps.print("250 OK\r\n");
     }
 
+    /**
+     * close
+     */
     private void doQuit() {
-        ps.println("221 Welcome to my smtp serve");
+        ps.print("221 Welcome to my smtp serve\r\n");
     }
 
+    /**
+     * parse mine
+     */
     private void doData() {
         try {
-            ps.println("354 End data with <CR><LF>.<LF><CR>");
+            ps.print("354 Start mail input; end with <CRLF>.<CRLF>\r\n");
             String line = null;
             StringBuilder stringBuffer = new StringBuilder();
             while ((line = br.readLine()) != null) {
-                if (line.equals(".")) {
+                if (".".equals(line)) {
                     break;
                 }
                 stringBuffer.append(line).append("\r");
             }
             stringBuffer.deleteCharAt(stringBuffer.length() - 1);
             try {
-                //event and async execute
+                //publish insert to db event
                 MimeMessage mimeMessage = MimeMessageUtils.createMimeMessage(null, new ByteArrayInputStream(stringBuffer.toString().getBytes()));
                 MimeMessageParser parser = new MimeMessageParser(mimeMessage);
+                log.info("publish event=============>> 1 step");
                 MessageEventParam messageEventParam = new MessageEventParam();
                 messageEventParam.setParser(parser);
                 MessageEvent event = new MessageEvent(messageEventParam);
                 MonolithEventManager.publishEvent(event);
+                log.info("publish event=============>> 2 step");
             } catch (Exception e) {
-                log.error("publish event error",e);
-                ps.println("500  ERROR");
+                log.error("publish event error", e);
+                ps.print("500  ERROR\r\n");
             }
-            ps.println("250 OK");
-            ps.flush();
+            ps.print("250 OK\r\n");
         } catch (IOException e) {
-            ps.println("500  ERROR");
+            ps.print("500  ERROR\r\n");
             log.error("doData error....", e);
         }
     }
 
-    private void doRcpt(String command) {
-        ps.println("250  OK");
-        ps.flush();
+    private void doRcpt() {
+        ps.print("250  OK\r\n");
     }
 
-    private void doMail(String command) {
-        ps.println("250  OK");
-        ps.flush();
+    /**
+     * do mail
+     */
+    private void doMail() {
+        ps.print("250  OK\r\n");
     }
 
+    /**
+     * reset
+     */
     private void doRset() {
-        ps.println("250 OK");
-        ps.flush();
+        ps.print("250 OK\r\n");
     }
 
+    /**
+     * smtp supports
+     */
     private void doHello() {
-        ps.println("250-Welcome to my smtp server");
-        ps.println("250-PIPELINING");
-        ps.println("250-SIZE 10485760");
-        ps.println("250 8BITMIME");
-        ps.flush();
+        ps.print("250-Welcome to my smtp server\r\n250-PIPELINING\r\n250-SIZE 10485760\r\n250-8BITMIME\r\n250 SMTPUTF8\r\n");
     }
 
+    /**
+     * one
+     */
     private void doWelcome() {
-        ps.println("220 Welcome to my smtp server");
-        ps.flush();
+        ps.print("220 mail.gitee.ltd Service ready\r\n");
     }
 }
