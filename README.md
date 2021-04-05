@@ -2,6 +2,11 @@
 ***
 ###  English | [简体中文](./README_zh.md)
 ***
+Experience address: http://8.136.23.192:9091/#/
+***
+Use with front-end interface... <br/>
+Project front end address: https://github.com/linenhui023/monolith-ui
+***
 ### Function
 - 1: support random email address switching
 - 2: display the latest email in real time
@@ -22,14 +27,15 @@ Docker run -- name monolith - D - P 25:25 - P port mapping: 8080 monolith
 - 8: open IP: port / to access
 ***
 >Tips: what you're doing
-- ~~1: write a more complete document~~, and the principle of anonymous post office
-- ~~2: test several common email service providers on the market~~(<font color = "red">complete</font>)
-- 3: mail address can be destroyed or not
-- 4: websocket displays data to UI, consider changing to netty to implement WS
-- 5: test the problem in the scenario of receiving a large number of e-mails
-- 6: WS is disconnected after a period of time, to be solved
-- ~~7: the email sent from outlook 163 126 mailbox can't be received, so you need to check the problem~~ (<font color = "red"> complete</font>)
-- 8: write a nice UI to show your email
+- ~~1: Write a more complete document~~, and the principle of anonymous post office
+- ~~2: Test many common mailbox service providers in the market~~ (<font color="red">complete</font>)
+- 3: The email address is optional
+- 4: WebSocket displays data to UI, consider switching to Netty to implement WebSocket
+- 5: Test the problem in the scenario of mass mail reception
+- 6: ~~The WS connection is disconnected after a period of time, which needs to be solved~~(<font color="red" > complete </font>)
+- ~~7: Outlook 163 126 E-mail cannot be received, need to troubleshoot the problem~~(<font color="red"> complete </font>)
+- ~~8: Write a~~ nice ~~UI to display the email~~ (<font color="red">complete</font>)
+- 9: Implement email forgery to send, make a more interesting gadget
 ***
 >Mention the current status of this small tool, there are a lot of unreasonable project code, I first limited technology, and second, the work of this period of time is relatively busy. The purpose of this project is to learn from the experience of open source community. I can't build a car behind closed doors. This is my biggest feeling. I am open-minded to accept the criticisms and suggestions of the big guys
 > ***
